@@ -1,11 +1,28 @@
-package io.prediction.examples.stock
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.predictionio.examples.stock
 
 // YahooDataSource reads PredictionIO event store directly.
 
-import io.prediction.data.storage.Event
-import io.prediction.data.storage.Storage
-import io.prediction.data.view.LBatchView
-import io.prediction.data.storage.DataMap
+import org.apache.predictionio.data.storage.Event
+import org.apache.predictionio.data.storage.Storage
+import org.apache.predictionio.data.view.LBatchView
+import org.apache.predictionio.data.storage.DataMap
 
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -14,8 +31,8 @@ import com.github.nscala_time.time.Imports._
 import scala.collection.mutable.{ Map => MMap }
 import scala.collection.GenMap
 
-import io.prediction.controller._
-import io.prediction.controller.{ Params => BaseParams }
+import org.apache.predictionio.controller._
+import org.apache.predictionio.controller.{ Params => BaseParams }
 
 
 import org.apache.spark.SparkContext
@@ -27,13 +44,13 @@ import org.json4s._
 //import org.saddle._
 
 case class HistoricalData(
-  val ticker: String,
-  val timeIndex: Array[DateTime],
-  val close: Array[Double],
-  val adjClose: Array[Double],
-  val adjReturn: Array[Double],
-  val volume: Array[Double],
-  val active: Array[Boolean]) extends Serializable {
+  ticker: String,
+  timeIndex: Array[DateTime],
+  close: Array[Double],
+  adjClose: Array[Double],
+  adjReturn: Array[Double],
+  volume: Array[Double],
+  active: Array[Boolean]) {
 
   override def toString(): String = {
     s"HistoricalData($ticker, ${timeIndex.head}, ${timeIndex.last}, " +
@@ -335,31 +352,31 @@ class YahooDataSource(val params: YahooDataSource.Params)
 
 object YahooDataSource {
   case class Params(
-    val windowParams: DataSourceParams,
+    windowParams: DataSourceParams,
     // Below filters with DataAPISpecific details
-    val appId: Int,  // Ignore appId in DataSourceParams
-    val entityType: String,
-    val startTime: Option[DateTime] = None,
-    val untilTime: Option[DateTime] = None
+    appId: Int,  // Ignore appId in DataSourceParams
+    entityType: String,
+    startTime: Option[DateTime] = None,
+    untilTime: Option[DateTime] = None
   ) extends BaseParams
 
   case class Daily(
-    val close: Double,
-    val adjClose: Double,
-    val adjReturn: Double,
-    val volume: Double,
-    val active: Boolean,
+    close: Double,
+    adjClose: Double,
+    adjReturn: Double,
+    volume: Double,
+    active: Boolean,
     // prevDate is used to verify continuity
-    val prevDate: DateTime)
+    prevDate: DateTime)
 
   /** Intermediate storage for constructing historical data
     * @param timeIndexSet Only datetime in this set is used to create historical
     * data.
     */
   case class Intermediate(
-    val ticker: String = "",
-    val dailyMap: Map[DateTime, Daily] = Map[DateTime, Daily]()
-    ) extends Serializable {
+    ticker: String = "",
+    dailyMap: Map[DateTime, Daily] = Map[DateTime, Daily]()
+    ) {
     override def toString(): String =
       s"YDS.Intermediate($ticker, size=${dailyMap.size})"
   }
